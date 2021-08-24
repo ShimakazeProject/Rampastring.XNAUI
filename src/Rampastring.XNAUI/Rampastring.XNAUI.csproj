@@ -6,11 +6,15 @@
     <Version>2.1.0</Version>
     <OutputPath>bin/$(Configuration)/$(Platform)/</OutputPath>
     <Platforms>Windows;WindowsGL;FNA</Platforms>
-    <Product>Rampastring.XNAUI</Product>
-    <Company>Rampastring</Company>
     <Description>Rampastring XNA/MonoGame UI Library</Description>
-    <Title>Rampastring XNA/MonoGame UI Library</Title>
     <Copyright>Copyright © Rami 'Rampastring' Pasanen 2016-2019</Copyright>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>Rampastring</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/Starry-Orbit-Studio/Rampastring.XNAUI</PackageProjectUrl>
+    <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Platform)'=='WindowsGL'">
@@ -22,6 +26,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|FNA'">
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Condition="'$(Platform)'=='WindowsGL'" Include="MonoGame.Framework.DesktopGL" Version="3.7.1.189" />
