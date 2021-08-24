@@ -15,6 +15,7 @@
     <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageVersion>$(Version)-$(Platform)</PackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Platform)'=='WindowsGL'">
