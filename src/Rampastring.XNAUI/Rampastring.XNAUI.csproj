@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net45</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Version>2.1.0</Version>
+    <OutputPath>bin/$(Configuration)/$(Platform)/</OutputPath>
+    <Platforms>Windows;WindowsGL;FNA</Platforms>
+    <Product>Rampastring.XNAUI</Product>
+    <Company>Rampastring</Company>
+    <Description>Rampastring XNA/MonoGame UI Library</Description>
+    <Title>Rampastring XNA/MonoGame UI Library</Title>
+    <Copyright>Copyright © Rami 'Rampastring' Pasanen 2016-2019</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Platform)'=='WindowsGL'">
+    <DefineConstants>$(DefineConstants);WINDOWSGL</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'=='FNA'">
+    <DefineConstants>$(DefineConstants);FNA</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|FNA'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Condition="'$(Platform)'=='WindowsGL'" Include="MonoGame.Framework.DesktopGL" Version="3.7.1.189" />
+    <PackageReference Condition="'$(Platform)'=='Windows'" Include="MonoGame.Framework.WindowsDX" Version="3.7.1.189" />
+    <ProjectReference Condition="'$(Platform)'=='FNA'" Include="..\..\lib\FNA\FNA.Core.csproj" />
+    <ProjectReference Include="..\..\lib\Rampastring.Tools\src\Rampastring.Tools\Rampastring.Tools.csproj" />
+  </ItemGroup>
+
+</Project>
