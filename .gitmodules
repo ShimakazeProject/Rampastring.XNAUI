@@ -1,0 +1,6 @@
+[submodule "lib/FNA"]
+	path = lib/FNA
+	url = git@github.com:Starry-Orbit-Studio/FNA.git
+[submodule "lib/Rampastring.Tools"]
+	path = lib/Rampastring.Tools
+	url = git@github.com:Starry-Orbit-Studio/Rampastring.Tools.git
