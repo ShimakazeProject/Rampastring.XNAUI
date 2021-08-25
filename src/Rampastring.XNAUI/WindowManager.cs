@@ -13,7 +13,9 @@ using Rampastring.XNAUI.Input;
 using System.Diagnostics;
 using System.Linq;
 using Rampastring.XNAUI.PlatformSpecific;
-using System.Windows.Forms;
+#if !FNA
+using System.Windows.Forms; 
+#endif
 
 namespace Rampastring.XNAUI
 {
@@ -210,7 +212,7 @@ namespace Rampastring.XNAUI
         {
             Logger.Log("Restarting game.");
 
-#if !XNA
+#if !XNA && !FNA
             // MonoGame takes ages to unload assets compared to XNA; sometimes MonoGame
             // can take over 8 seconds while XNA takes only 1 second
             // This is a bit dirty, but at least it makes the MonoGame build exit quicker
@@ -219,6 +221,8 @@ namespace Rampastring.XNAUI
             Application.DoEvents();
             Process.Start(Application.ExecutablePath);
             Environment.Exit(0);
+#elif FNA
+            throw new NotSupportedException();
 #else
             Application.Restart();
 #endif
@@ -241,7 +245,11 @@ namespace Rampastring.XNAUI
             Renderer.Initialize(GraphicsDevice, content, contentPath);
             SoundPlayer = new SoundPlayer(Game);
 
+#if FNA
+            gameWindowManager = new FNAGameWindowManager(Game);
+#else
             gameWindowManager = new WindowsGameWindowManager(Game);
+#endif
             gameWindowManager.GameWindowClosing += GameWindowManager_GameWindowClosing;
 
             if (UISettings.ActiveSettings == null)

@@ -570,8 +570,10 @@ namespace Rampastring.XNAUI.XNAControls
             if (!IsActive || !Enabled || SelectedItem == null)
                 return;
 
+#if !FNA
             if (e.PressedKey == Keys.C && Keyboard.IsCtrlHeldDown())
-                System.Windows.Forms.Clipboard.SetText(SelectedItem.Text);
+                System.Windows.Forms.Clipboard.SetText(SelectedItem.Text); 
+#endif
         }
 
 #if FNA

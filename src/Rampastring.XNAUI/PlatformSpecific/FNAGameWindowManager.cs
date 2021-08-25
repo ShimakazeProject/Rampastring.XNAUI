@@ -1,59 +1,42 @@
-﻿using Microsoft.Xna.Framework;
-using Rampastring.Tools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms; 
+using System.Threading.Tasks;
+
+using Microsoft.Xna.Framework;
+
+using Rampastring.Tools;
 
 namespace Rampastring.XNAUI.PlatformSpecific
 {
-    /// <summary>
-    /// Manages the game window on Windows.
-    /// </summary>
-    internal class WindowsGameWindowManager : IGameWindowManager
+    internal class FNAGameWindowManager : IGameWindowManager
     {
-        public WindowsGameWindowManager(Game game)
+        private Game _game;
+        private FNAWindow _window;
+        public FNAGameWindowManager(Game game)
         {
-            this.game = game;
-            gameForm = (Form)Control.FromHandle(game.Window.Handle);
-
-            if (gameForm != null)
-            {
-                gameForm.FormClosing += GameForm_FormClosing_Event;
-            } 
+            _game = game;
+            _window = game.Window as FNAWindow;
         }
-
-        private Form gameForm; 
-        private Game game;
 
         private bool closingPrevented = false;
 
         public event EventHandler GameWindowClosing;
 
 
-        private void GameForm_FormClosing_Event(object sender, FormClosingEventArgs e)
-        {
-            GameWindowClosing?.Invoke(this, EventArgs.Empty);
-        } 
-
         /// <summary>
         /// Centers the game window on the screen.
         /// </summary>
         public void CenterOnScreen()
         {
-            int x = (Screen.PrimaryScreen.Bounds.Width - game.Window.ClientBounds.Width) / 2;
-            int y = (Screen.PrimaryScreen.Bounds.Height - game.Window.ClientBounds.Height) / 2;
+            SDL2.SDL.SDL_GetCurrentDisplayMode(0, out var dm);
+            int x = (dm.w - _game.Window.ClientBounds.Width) / 2;
+            int y = (dm.h - _game.Window.ClientBounds.Height) / 2;
 
-#if XNA
-            if (gameForm == null)
-                return;
-
-            gameForm.DesktopLocation = new System.Drawing.Point(x, y);
-#else
-            game.Window.Position = new Microsoft.Xna.Framework.Point(x, y);
-#endif
+            SDL2.SDL.SDL_SetWindowPosition(_window.Handle, x, y);
         }
 
         /// <summary>
@@ -63,15 +46,7 @@ namespace Rampastring.XNAUI.PlatformSpecific
         /// windowed mode should be enabled.</param>
         public void SetBorderlessMode(bool value)
         {
-
-#if !XNA
-            game.Window.IsBorderless = value;
-#else
-            if (value)
-                gameForm.FormBorderStyle = FormBorderStyle.None;
-            else
-                gameForm.FormBorderStyle = FormBorderStyle.FixedSingle;
-#endif
+            _game.Window.IsBorderlessEXT = value;
         }
 
         /// <summary>
@@ -79,10 +54,10 @@ namespace Rampastring.XNAUI.PlatformSpecific
         /// </summary>
         public void MinimizeWindow()
         {
-            if (gameForm == null)
+            if (_window == null)
                 return;
 
-            gameForm.WindowState = FormWindowState.Minimized;
+            SDL2.SDL.SDL_MinimizeWindow(_window.Handle);
         }
 
         /// <summary>
@@ -90,10 +65,10 @@ namespace Rampastring.XNAUI.PlatformSpecific
         /// </summary>
         public void MaximizeWindow()
         {
-            if (gameForm == null)
+            if (_window == null)
                 return;
 
-            gameForm.WindowState = FormWindowState.Normal;
+            SDL2.SDL.SDL_RestoreWindow(_window.Handle);
         }
 
         /// <summary>
@@ -101,10 +76,10 @@ namespace Rampastring.XNAUI.PlatformSpecific
         /// </summary>
         public void HideWindow()
         {
-            if (gameForm == null)
+            if (_window == null)
                 return;
 
-            gameForm.Hide();
+            SDL2.SDL.SDL_HideWindow(_window.Handle);
         }
 
         /// <summary>
@@ -112,10 +87,10 @@ namespace Rampastring.XNAUI.PlatformSpecific
         /// </summary>
         public void ShowWindow()
         {
-            if (gameForm == null)
+            if (_window == null)
                 return;
 
-            gameForm.Show();
+            SDL2.SDL.SDL_ShowWindow(_window.Handle);
         }
 
         /// <summary>
@@ -123,10 +98,10 @@ namespace Rampastring.XNAUI.PlatformSpecific
         /// </summary>
         public void FlashWindow()
         {
-            if (gameForm == null)
+            if (_window == null)
                 return;
 
-            WindowFlasher.FlashWindowEx(gameForm);
+            //WindowFlasher.FlashWindowEx(_window);
         }
 
         /// <summary>
@@ -136,10 +111,15 @@ namespace Rampastring.XNAUI.PlatformSpecific
         /// <param name="path">The path to the icon file.</param>
         public void SetIcon(string path)
         {
-            if (gameForm == null)
+            if (_window == null)
                 return;
 
-            gameForm.Icon = Icon.ExtractAssociatedIcon(path);
+            var ico =new Bitmap(path);
+            var p_bmp = ico.GetHbitmap();
+
+            var surface = SDL2.SDL.SDL_CreateRGBSurfaceFrom(p_bmp,ico.Width,ico.Height,24,32, 0x0f00, 0x00f0, 0x000f, 0xf000);
+            SDL2.SDL.SDL_SetWindowIcon(_window.Handle, surface);
+            SDL2.SDL.SDL_FreeSurface(surface);
         }
 
         /// <summary>
@@ -148,10 +128,10 @@ namespace Rampastring.XNAUI.PlatformSpecific
         /// </summary>
         public IntPtr GetWindowHandle()
         {
-            if (gameForm == null)
+            if (_window == null)
                 return IntPtr.Zero;
 
-            return gameForm.Handle;
+            return _window.Handle;
         }
 
         /// <summary>
@@ -160,10 +140,10 @@ namespace Rampastring.XNAUI.PlatformSpecific
         /// <param name="value">True to enable the control box, false to disable it.</param>
         public void SetControlBox(bool value)
         {
-            if (gameForm == null)
+            if (_window == null)
                 return;
 
-            gameForm.ControlBox = value;
+            //_window.ControlBox = value;
         }
 
         /// <summary>
@@ -171,17 +151,12 @@ namespace Rampastring.XNAUI.PlatformSpecific
         /// </summary>
         public void PreventClosing()
         {
-            if (gameForm == null)
+            if (_window == null)
                 return;
 
-            if (!closingPrevented)
-                gameForm.FormClosing += GameForm_FormClosing;
+            //if (!closingPrevented)
+            //    _window.FormClosing += _window_FormClosing;
             closingPrevented = true;
-        }
-
-        private void GameForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            e.Cancel = true;
         }
 
         /// <summary>
@@ -189,19 +164,20 @@ namespace Rampastring.XNAUI.PlatformSpecific
         /// </summary>
         public void AllowClosing()
         {
-            if (gameForm == null)
+            if (_window == null)
                 return;
 
-            gameForm.FormClosing -= GameForm_FormClosing;
+            //_window.FormClosing -= _window_FormClosing;
             closingPrevented = false;
         }
 
         public bool HasFocus()
         {
-            if (gameForm == null)
-                return game.IsActive;
+            if (_window == null)
+                return _game.IsActive;
 
-            return Form.ActiveForm != null;
+            var flag = SDL2.SDL.SDL_GetWindowFlags(GetWindowHandle());
+            return (flag & 0x00000200) == 0x00000200;
         }
     }
 }

@@ -353,6 +353,7 @@ namespace Rampastring.XNAUI.XNAControls
                     }
 
                     return true;
+#if !FNA
                 case Keys.X:
                     if (!Keyboard.IsCtrlHeldDown())
                         break;
@@ -383,7 +384,8 @@ namespace Rampastring.XNAUI.XNAControls
                     if (!string.IsNullOrEmpty(text))
                         System.Windows.Forms.Clipboard.SetText(text);
 
-                    return true;
+                    return true; 
+#endif
                 case Keys.Enter:
                     EnterPressed?.Invoke(this, EventArgs.Empty);
                     return true;
